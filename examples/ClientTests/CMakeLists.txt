@@ -469,6 +469,15 @@ dd4hep_add_test_reg( box_shape_build_type
   REGEX_FAIL "Exception;EXCEPTION;ERROR"
 )
 #
+# Test interrupt handling in the middle of the geometry construction
+dd4hep_add_test_reg( ClientTests_interrupt_geometry_construction
+  COMMAND    "${CMAKE_INSTALL_PREFIX}/bin/run_test_ClientTests.sh"
+  EXEC_ARGS  geoDisplay -compact ${ClientTestsEx_INSTALL}/compact/InterruptTrigger.xml 
+  -load -print INFO
+  REGEX_PASS "\\+\\+\\+ Caught signal: 2 context: 0xfeedbabe. exit process."
+  REGEX_FAIL "Exception;EXCEPTION;ERROR"
+)
+#
 #      EXEC_ARGS  test_with_root.sh ${script}
 #
 if (DD4HEP_USE_GEANT4)
@@ -632,4 +641,18 @@ if (DD4HEP_USE_GEANT4)
       REGEX_PASS "ResourcesAfterConstruction       ConstructSD:   VmRSS"
       REGEX_FAIL "Error;ERROR; Exception"
   )
+
+  dd4hep_add_test_reg(ClientTests_ddsim_setup_BoxOfStraws
+      COMMAND    "${CMAKE_INSTALL_PREFIX}/bin/run_test_ClientTests.sh"
+      EXEC_ARGS  ddsim
+                 --steeringFile ${ClientTestsEx_INSTALL}/scripts/BoxOfStraws_DDSim.py
+                 --compactFile ${ClientTestsEx_INSTALL}/compact/BoxOfStraws.xml
+                 --enableGun
+                 --numberOfEvents 1
+                 --outputFile regex.slcio
+
+      REGEX_PASS "BoxOfStrawsDet Handled 1 nodes with 1 sensitive volume type"
+      REGEX_FAIL "Error;ERROR; Exception"
+  )
+
 endif(DD4HEP_USE_GEANT4)
